@@ -9,6 +9,8 @@ class Choice {
 const List<Choice> choices = const <Choice>[
   const Choice(title: 'sort', icon: Icons.sort),
   const Choice(title: 'search', icon: Icons.search),
+  const Choice(title: 'memo', icon: Icons.insert_drive_file),
+
 ];
 
 List<Widget> list = <Widget>[
@@ -17,7 +19,7 @@ List<Widget> list = <Widget>[
         style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
     subtitle: new Text('2018/2/13'),
     leading: new Icon(
-      Icons.insert_drive_file ,
+      choices[2].icon,
       color: Colors.pink,
     ),
   ),
@@ -26,19 +28,49 @@ List<Widget> list = <Widget>[
         style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
     subtitle: new Text('2018/2/14'),
     leading: new Icon(
-      Icons.insert_drive_file ,
+      choices[2].icon,
       color: Colors.pink,
     ),
   ),
 ];
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  Choice _selectedChoice = choices[0];
+
+  void _select(Choice choice) {
+    setState(() { // Causes the app to rebuild with the new _selectedChoice.
+      _selectedChoice = choice;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.title),
-        elevation: 5.0, // Removing the drop shadow cast by the app bar.//
+        elevation: 5.0,
+        actions: <Widget>[
+          new IconButton( // action button
+            icon: new Icon(choices[0].icon),
+            onPressed: () { _select(choices[0]); },
+          ),
+          new IconButton( // action button
+            icon: new Icon(choices[1].icon),
+            onPressed: () { _select(choices[1]); },
+          ),
+          new PopupMenuButton<Choice>( // overflow menu
+            onSelected: _select,
+            itemBuilder: (BuildContext context) {
+              return choices.skip(2).map((Choice choice) {
+                return new PopupMenuItem<Choice>(
+                  value: choice,
+                  child: new Text(choice.title),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: new Center(
         child: new ListView(
@@ -65,7 +97,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.pink,
       ),
-      home: new MyHomePage(title: 'Memomomo'),
+      home: new MyHomePage(title: 'Memomo'),
     );
   }
 }
