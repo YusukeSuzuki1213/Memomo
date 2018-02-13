@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //
 class CreatePageState extends State<CreatePage>{
   final TextEditingController _titleController = new TextEditingController();
+  final TextEditingController _bodyController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -15,21 +16,27 @@ class CreatePageState extends State<CreatePage>{
           new TextField(
             controller: _titleController,
             decoration: new InputDecoration(
-              hintText: 'Type something',
+              hintText: 'Title',
             ),
           ),
 
+          new TextField(
+            controller: _bodyController,
+            decoration: new InputDecoration(
+              hintText: '',
+            ),
+            maxLines: 20,
+          ),
+
           new RaisedButton(
+            child: const Text('save'),
+            textColor:Colors.pink,
+            color: Colors.white,
+            elevation: 2.0,
+            splashColor: Colors.pink,
             onPressed: () {
-              showDialog(
-                context: context,
-                child: new AlertDialog(
-                  title: new Text('What you typed'),
-                  content: new Text(_titleController.text),
-                ),
-              );
+              //ここに保存処理
             },
-            child: new Text('save'),
           ),
         ],
       )

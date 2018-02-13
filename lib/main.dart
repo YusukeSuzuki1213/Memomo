@@ -19,20 +19,22 @@ List<Widget> list = <Widget>[
   new ListTile(
     title: new Text('memo1',
         style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
-    subtitle: new Text('2018/2/13'),
+    subtitle: new Text('ここにメモの冒頭部分を一行におさまるくらいまで書く'),
     leading: new Icon(
       choices[2].icon,
       color: Colors.pink,
     ),
+    trailing: new Text('2018/2/13 14:56'),
   ),
   new ListTile(
     title: new Text('memo2',
         style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
-    subtitle: new Text('2018/2/14'),
+    subtitle: new Text('明日の昼には...'),
     leading: new Icon(
       choices[2].icon,
       color: Colors.pink,
     ),
+    trailing: new Text('2018/2/13'),
   ),
 ];
 
