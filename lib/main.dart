@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:memomo/create.dart/';
 class Choice {
   const Choice({ this.title, this.icon });
   final String title;
@@ -10,6 +10,8 @@ const List<Choice> choices = const <Choice>[
   const Choice(title: 'sort', icon: Icons.sort),
   const Choice(title: 'search', icon: Icons.search),
   const Choice(title: 'memo', icon: Icons.insert_drive_file),
+  const Choice(title: 'add', icon: Icons.add),
+
 
 ];
 
@@ -42,6 +44,13 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() { // Causes the app to rebuild with the new _selectedChoice.
       _selectedChoice = choice;
     });
+  }
+
+  void createMemo(){
+    Navigator.push(context, new MaterialPageRoute<Null>(
+        settings: const RouteSettings(name: "/create"),
+        builder: (BuildContext context) => new CreatePage(title:widget.title),
+    ));
   }
 
   @override
@@ -77,6 +86,11 @@ class _MyHomePageState extends State<MyHomePage> {
           children: list,
         ),
       ),
+      floatingActionButton: new FloatingActionButton(
+        onPressed:createMemo,
+        tooltip: 'Increment',
+        child: new Icon(choices[3].icon),
+      ), // T
     );
   }
 }
