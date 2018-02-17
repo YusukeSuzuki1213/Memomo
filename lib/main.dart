@@ -19,7 +19,7 @@ List<Widget> list = <Widget>[
   new ListTile(
     title: new Text('memo1',
         style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
-    subtitle: new Text('ここにメモの冒頭部分を一行におさまるくらいまで書く'),
+    subtitle: new Text('ここにメモの冒頭部分を一行におさまるくらいまで書くようにする'),
     leading: new Icon(
       choices[2].icon,
       color: Colors.pink,
