@@ -3,6 +3,8 @@ import 'package:memomo/create.dart';
 import 'package:memomo/icons.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
+
 
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
@@ -41,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           color: Colors.pink,
         ),
         trailing: new Text(item["updated_at"]),
-        //onLongPress: ,
+        onLongPress: _askedToLead,
         //onTap: ,
       ));
     }
@@ -54,6 +56,33 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       list = result;
     });
 
+  }
+
+  Future<Null> _askedToLead() async {
+    await showDialog<Null>(
+      context: context,
+      child: new SimpleDialog(
+        contentPadding:new EdgeInsets.all(8.0),
+        children: <Widget>[
+          new SimpleDialogOption(
+            onPressed: () {print("押された1");},
+            child: const Text('タイトルをコピー'),
+          ),
+          new SimpleDialogOption(
+            onPressed: () {print("押された２");},
+            child: const Text('メモをコピー'),
+          ),
+          new SimpleDialogOption(
+            onPressed: () {print("押された３");},
+            child: const Text('タイトルとメモをコピー'),
+          ),
+          new SimpleDialogOption(
+            onPressed: () {print("押された４");},
+            child: const Text('削除'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _select(Choice choice) {
