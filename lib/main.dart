@@ -1,46 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:memomo/create.dart/';
-class Choice {
-  const Choice({ this.title, this.icon });
-  final String title;
-  final IconData icon;
-}
-
-const List<Choice> choices = const <Choice>[
-  const Choice(title: 'sort', icon: Icons.sort),
-  const Choice(title: 'search', icon: Icons.search),
-  const Choice(title: 'memo', icon: Icons.insert_drive_file),
-  const Choice(title: 'add', icon: Icons.add),
+import 'package:memomo/create.dart';
+import 'package:memomo/icons.dart';
+import 'dart:convert';
+import 'dart:io';
 
 
-];
-
-List<Widget> list = <Widget>[
-  new ListTile(
-    title: new Text('memo1',
-        style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
-    subtitle: new Text('ここにメモの冒頭部分を一行におさまるくらいまで書くようにする'),
-    leading: new Icon(
-      choices[2].icon,
-      color: Colors.pink,
-    ),
-    trailing: new Text('2018/2/13 14:56'),
-  ),
-  new ListTile(
-    title: new Text('memo2',
-        style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
-    subtitle: new Text('明日の昼には...'),
-    leading: new Icon(
-      choices[2].icon,
-      color: Colors.pink,
-    ),
-    trailing: new Text('2018/2/13'),
-  ),
-];
-
-class _MyHomePageState extends State<MyHomePage> {
-
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Choice _selectedChoice = choices[0];
+  final url = "http://www.suzusupo-niiyan.ga/memomo/read.php";
+  List<Widget> list = new List<Widget>();
+
+
+  void  makeMemoList() async{
+    final uri = new Uri.http('www.suzusupo-niiyan.ga', '/memomo/read.php', {'user_id':'1'});
+    var httpClient = new HttpClient();
+    List<Widget> result = new List<Widget>();
+    var memoData;
+
+    try {
+      var request = await httpClient.postUrl(uri);
+      var response = await request.close();
+      if (response.statusCode == HttpStatus.OK) {
+        print("Succeeded in getting memo data");
+        var json = await response.transform(UTF8.decoder).join();
+        memoData = JSON.decode(json);
+      }else{
+        print('Error getting memo data:\nHttp status ${response.statusCode}');
+      }
+    }catch (exception) {
+      print('Failed getting memo data');
+    }
+
+    for (var item in memoData) {
+      result.add(new ListTile(
+        title: new Text(item["title"],
+            style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
+        subtitle: new Text(item["content"]),
+        leading: new Icon(
+          choices[2].icon,
+          color: Colors.pink,
+        ),
+        trailing: new Text(item["updated_at"]),
+        //onLongPress: ,
+        //onTap: ,
+      ));
+    }
+
+
+    if (!mounted) return;
+
+    setState(() {
+      print(result);
+      list = result;
+    });
+
+  }
 
   void _select(Choice choice) {
     setState(() { // Causes the app to rebuild with the new _selectedChoice.
@@ -54,6 +68,23 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (BuildContext context) => new CreatePage(title:widget.title),
     ));
   }
+
+  @override
+  void initState() {
+    makeMemoList();
+    print("oncreate was called");
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    print("dispose was called");
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  AppLifecycleState _notification;
 
   @override
   Widget build(BuildContext context) {
@@ -70,24 +101,25 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: new Icon(choices[1].icon),
             onPressed: () { _select(choices[1]); },
           ),
-          new PopupMenuButton<Choice>( // overflow menu
-            onSelected: _select,
-            itemBuilder: (BuildContext context) {
-              return choices.skip(2).map((Choice choice) {
-                return new PopupMenuItem<Choice>(
-                  value: choice,
-                  child: new Text(choice.title),
-                );
-              }).toList();
-            },
-          ),
+//          new PopupMenuButton<Choice>( // overflow menu
+//            onSelected: _select,
+//            itemBuilder: (BuildContext context) {
+//              return choices.skip(2).map((Choice choice) {
+//                return new PopupMenuItem<Choice>(
+//                  value: choice,
+//                  child: new Text(choice.title),
+//                );
+//              }).toList();
+//            },
+//          ),
         ],
       ),
       body: new Center(
         child: new ListView(
-          children: list,
+          children: list
         ),
       ),
+
       floatingActionButton: new FloatingActionButton(
         onPressed:createMemo,
         tooltip: 'Increment',
@@ -113,7 +145,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.pink,
       ),
-      home: new MyHomePage(title: 'Memomo'),
+      home: new Scaffold(body: new MyHomePage(title:"Memomo")),
     );
   }
 }
