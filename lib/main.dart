@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:memomo/create.dart';
 import 'package:memomo/icons.dart';
 import 'dart:convert';
@@ -8,6 +9,7 @@ import 'dart:async';
 
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  final GlobalKey<ScaffoldState> _mainPageScaffoldKey = new GlobalKey<ScaffoldState>();
   Choice _selectedChoice = choices[0];
   final url = "http://www.suzusupo-niiyan.ga/memomo/read.php";
   List<Widget> list = new List<Widget>();
@@ -43,12 +45,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           color: Colors.pink,
         ),
         trailing: new Text(item["updated_at"]),
-        onLongPress: _askedToLead,
+        onLongPress:() {_askedToLead(item["title"],item["content"]);},
         //onTap: ,
       ));
     }
-
-
     if (!mounted) return;
 
     setState(() {
@@ -58,27 +58,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   }
 
-  Future<Null> _askedToLead() async {
+  Future<Null> _askedToLead(String title,String content) async {
     await showDialog<Null>(
       context: context,
       child: new SimpleDialog(
         contentPadding:new EdgeInsets.all(8.0),
         children: <Widget>[
           new SimpleDialogOption(
-            onPressed: () {print("押された1");},
-            child: const Text('タイトルをコピー'),
+            onPressed: () {
+              print(title);
+              Clipboard.setData(new ClipboardData(text: title));
+              _mainPageScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('copied')));
+              Navigator.of(context).pop();
+            },
+            child: const Text('タイトルをコピー',
+                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
           new SimpleDialogOption(
-            onPressed: () {print("押された２");},
-            child: const Text('メモをコピー'),
+            onPressed: () {
+              print(content);
+              Clipboard.setData(new ClipboardData(text: content));
+              _mainPageScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('copied')));
+                  Navigator.of(context).pop();
+            },
+            child: const Text('メモをコピー',
+                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
           new SimpleDialogOption(
-            onPressed: () {print("押された３");},
-            child: const Text('タイトルとメモをコピー'),
+            onPressed: () {
+              Clipboard.setData(new ClipboardData(text: title+"\n"+content));
+              _mainPageScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('copied')));
+              Navigator.of(context).pop();
+              },
+            child: const Text('タイトルとメモをコピー',
+                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
           new SimpleDialogOption(
-            onPressed: () {print("押された４");},
-            child: const Text('削除'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('削除',
+                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
         ],
       ),
@@ -118,6 +138,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      key: _mainPageScaffoldKey,
       appBar: new AppBar(
         title: new Text(widget.title),
         elevation: 5.0,
