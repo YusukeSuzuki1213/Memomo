@@ -7,18 +7,59 @@ import 'dart:io';
 import 'dart:async';
 
 
+class _ListTile extends ListTile{
+  final Widget leading;
+  final Widget title;
+  final Widget subtitle;
+  final Widget trailing;
+  final bool isThreeLine;
+  final bool dense;
+  final bool enabled;
+  final GestureTapCallback onTap;
+  final GestureLongPressCallback onLongPress;
+  final bool selected;
+  final int id;
+
+  _ListTile({
+    Key key,
+    this.leading,
+    this.title,
+    this.subtitle,
+    this.trailing,
+    this.isThreeLine: false,
+    this.dense,
+    this.enabled: true,
+    this.onTap,
+    this.onLongPress,
+    this.selected: false,
+    this.id,
+  })
+      :super(
+      key:key,
+      leading:leading,
+      title:title,
+      subtitle:subtitle,
+      trailing:trailing,
+      isThreeLine:isThreeLine,
+      dense:dense,
+      enabled:enabled,
+      onTap:onTap,
+      onLongPress:onLongPress,
+      selected:selected);
+  int get getId => id;
+}
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _mainPageScaffoldKey = new GlobalKey<ScaffoldState>();
   Choice _selectedChoice = choices[0];
   final url = "http://www.suzusupo-niiyan.ga/memomo/read.php";
-  List<Widget> list = new List<Widget>();
+  List<_ListTile> list = new List<_ListTile>();
 
 
   void  makeMemoList() async{
     final uri = new Uri.http('www.suzusupo-niiyan.ga', '/memomo/read.php', {'user_id':'1'});
     var httpClient = new HttpClient();
-    List<Widget> result = new List<Widget>();
+    List<_ListTile> result = new List<_ListTile>();
     var memoData;
 
     try {
@@ -36,7 +77,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
 
     for (var item in memoData) {
-      result.add(new ListTile(
+      print(new ListTile().hashCode);
+      result.add(new _ListTile(
+        id:int.parse(item["id"]),
         title: new Text(item["title"],
             style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
         subtitle: new Text(item["content"]),
@@ -46,8 +89,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ),
         trailing: new Text(item["updated_at"]),
         onLongPress:() {_askedToLead(item["title"],item["content"]);},
-        //onTap: ,
+        //onTap: ,//ここにgetIdを入れる
       ));
+    }
+
+    for(var item in result){
+      print(item.getId);
     }
     if (!mounted) return;
 

@@ -7,15 +7,18 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
   final TextEditingController _titleController = new TextEditingController();
   final TextEditingController _contentController = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  String savedTitle = "";
+  String savedContent = "";
+  bool isSaved = false;
 
   bool _hasUserEditedMemo() {
     //(title,content)->empty
     if(_titleController.text.isEmpty && _contentController.text.isEmpty){
       return false;
-    }else{
-
+    }else if(_titleController.text == savedTitle && _contentController.text == savedContent){
+      return false;
     }
-    return true;//保存されてbackキーが押されているか
+    return true;
   }
   Future<bool> _requestPop() {
     if (_hasUserEditedMemo()) {
@@ -29,7 +32,9 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
             new FlatButton(
               child: new Text('YES'),
               onPressed: () {
-                saveMemo(_titleController.text, _contentController.text);
+                isSaved
+                  ? updateMemo(_titleController.text, _contentController.text)
+                  :saveMemo(_titleController.text, _contentController.text);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
@@ -94,9 +99,16 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
             new IconButton(
               icon: new Icon(choices[4].icon),
               onPressed: (){
-                if(_titleController.text.isNotEmpty||_contentController.text.isNotEmpty){
-                  saveMemo(_titleController.text, _contentController.text);
-                  _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('saved')));
+                if(_titleController.text.isNotEmpty || _contentController.text.isNotEmpty){
+                  isSaved
+                      ? updateMemo(_titleController.text, _contentController.text)
+                      : saveMemo(_titleController.text, _contentController.text);
+                  isSaved
+                      ? _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('updated')))
+                      : _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('saved')));
+                  isSaved = true;
+                  savedTitle = _titleController.text;
+                  savedContent = _contentController.text;
                 }else{
                   _doNotSave();
                 }
