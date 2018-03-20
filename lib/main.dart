@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           ),
           new SimpleDialogOption(
             onPressed: () {
-              Clipboard.setData(new ClipboardData(text: title+"\n"+content));
+              Clipboard.setData(new ClipboardData(text: "# "+title+"\n"+content));
               _mainPageScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('copied')));
               Navigator.of(context).pop();
               },

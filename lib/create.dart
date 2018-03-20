@@ -9,7 +9,13 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   bool _hasUserEditedMemo() {
-    return true;//保存されてbackキーが押されているか、あと無入力のときは無条件でtrue
+    //(title,content)->empty
+    if(_titleController.text.isEmpty && _contentController.text.isEmpty){
+      return false;
+    }else{
+
+    }
+    return true;//保存されてbackキーが押されているか
   }
   Future<bool> _requestPop() {
     if (_hasUserEditedMemo()) {
@@ -17,19 +23,27 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
         context: context,
         barrierDismissible: false,
         child: new AlertDialog(
-          title: new Text('Discard your changes?'),
+          title: new Text('保存しますか？'),
           content: new Text(''),
           actions: <Widget>[
             new FlatButton(
-              child: new Text('NO'),
+              child: new Text('YES'),
               onPressed: () {
+                saveMemo(_titleController.text, _contentController.text);
+                Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
             ),
             new FlatButton(
-              child: new Text('DISCARD'),
+              child: new Text('NO'),
               onPressed: () {
                 Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text('キャンセル'),
+              onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
@@ -39,8 +53,29 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
 
       return new Future.value(false);
     } else {
+      Navigator.of(context).pop();
       return new Future.value(true);
     }
+  }
+
+  Future<bool> _doNotSave() {
+      showDialog<Null>(
+        context: context,
+        barrierDismissible: false,
+        child: new AlertDialog(
+          title: new Text('You can\'t save memo'),
+          content: new Text('なんか書け'),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+      return new Future.value(false);
   }
 
 
@@ -59,10 +94,12 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
             new IconButton(
               icon: new Icon(choices[4].icon),
               onPressed: (){
-                saveMemo(_titleController.text, _contentController.text);
-                _scaffoldKey.currentState.showSnackBar(new SnackBar(
-                    content: new Text('saved')
-                ));
+                if(_titleController.text.isNotEmpty||_contentController.text.isNotEmpty){
+                  saveMemo(_titleController.text, _contentController.text);
+                  _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('saved')));
+                }else{
+                  _doNotSave();
+                }
               },//保存処理,
             ),
           ]
