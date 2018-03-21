@@ -35,7 +35,7 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
               onPressed: () {
                 isSaved
                     ? updateMemo(memoId,_titleController.text, _contentController.text)
-                    : memoId = saveMemo(_titleController.text, _contentController.text);
+                    : saveMemo(_titleController.text, _contentController.text).then((id) => memoId = id);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
@@ -102,7 +102,7 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
                 if(_titleController.text.isNotEmpty || _contentController.text.isNotEmpty){
                   isSaved
                       ? updateMemo(memoId,_titleController.text, _contentController.text)
-                      : print(saveMemo(_titleController.text, _contentController.text));
+                      : saveMemo(_titleController.text, _contentController.text).then((id) => memoId = id);
                   isSaved
                       ? _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('updated')))
                       : _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('saved')));

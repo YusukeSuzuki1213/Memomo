@@ -120,8 +120,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             onPressed: () {},
           ),
           new IconButton(
-            icon:new Icon(Icons.autorenew),
-            onPressed: (){},
+            icon:new Icon(Icons.sync),
+            onPressed: (){_makeMemoList();},
           )
 //          new PopupMenuButton<Choice>( // overflow menu
 //            onSelected: _select,

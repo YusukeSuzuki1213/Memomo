@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-
+import 'dart:async';
 getMemo() async{
    final uri = new Uri.http('www.suzusupo-niiyan.ga', '/memomo/read.php', {'user_id':'1'});
    var httpClient = new HttpClient();
@@ -26,34 +26,36 @@ getMemo() async{
 }
 
 
-String saveMemo(title,content){
+Future<String> saveMemo(title,content) async{
   final url = "http://www.suzusupo-niiyan.ga/memomo/create.php";
-  http.post(url, body: {
+  var response = await http.post(url, body:
+  {
     "user_id": "1",
     "title": title,
     "content": content,
     "created_at":new DateTime.now().toString(),
     "updated_at":new DateTime.now().toString()
-  }).then((response) {
+  });
     print("Response status: ${response.statusCode}");
     print("Response body: ${response.body}");
     return response.body.toString();
-  });
 }
 
 void updateMemo(id,title,content){
-  //print(content);
+  print(id+"\n");
+  print(title+"\n");
+  print(content+"\n");
 
-//  final url = "http://www.suzusupo-niiyan.ga/memomo/update.php";
-//  http.post(url, body: {
-//    "user_id": "1",
-//    "id":id,
-//    "title": title,
-//    "content": content,
-//    "updated_at":new DateTime.now().toString()
-//  }).then((response) {
-//    print("Response status: ${response.statusCode}");
-//    print("Response body: ${response.body}");
-//  });
+  final url = "http://www.suzusupo-niiyan.ga/memomo/update.php";
+  http.post(url, body: {
+    "user_id": "1",
+    "id":id,
+    "title": title,
+    "content": content,
+    "updated_at":new DateTime.now().toString()
+  }).then((response) {
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+  });
 
 }
