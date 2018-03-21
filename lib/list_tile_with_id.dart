@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class _ListTile extends ListTile{
+class ListTileWithId extends ListTile{
   final Widget leading;
   final Widget title;
   final Widget subtitle;
@@ -13,7 +13,7 @@ class _ListTile extends ListTile{
   final bool selected;
   final int id;
 
-  _ListTile({
+  ListTileWithId({
     Key key,
     this.leading,
     this.title,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:memomo/icons.dart';
 import 'package:memomo/http.dart';
 import 'dart:async';
 
@@ -10,6 +9,7 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
   String savedTitle = "";
   String savedContent = "";
   bool isSaved = false;
+  String memoId;
 
   bool _hasUserEditedMemo() {
     //(title,content)->empty
@@ -20,21 +20,22 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
     }
     return true;
   }
-  Future<bool> _requestPop() {
+
+  Future<bool> _askTosave() {
     if (_hasUserEditedMemo()) {
       showDialog<Null>(
         context: context,
         barrierDismissible: false,
         child: new AlertDialog(
-          title: new Text('保存しますか？'),
+          title: new Text('Do you want to save it?'),
           content: new Text(''),
           actions: <Widget>[
             new FlatButton(
               child: new Text('YES'),
               onPressed: () {
                 isSaved
-                  ? updateMemo(_titleController.text, _contentController.text)
-                  :saveMemo(_titleController.text, _contentController.text);
+                    ? updateMemo(memoId,_titleController.text, _contentController.text)
+                    : memoId = saveMemo(_titleController.text, _contentController.text);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
@@ -47,7 +48,7 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
               },
             ),
             new FlatButton(
-              child: new Text('キャンセル'),
+              child: new Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -55,7 +56,6 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
           ],
         ),
       );
-
       return new Future.value(false);
     } else {
       Navigator.of(context).pop();
@@ -69,7 +69,7 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
         barrierDismissible: false,
         child: new AlertDialog(
           title: new Text('You can\'t save memo'),
-          content: new Text('なんか書け'),
+          content: new Text('Memo is empty!'),
           actions: <Widget>[
             new FlatButton(
               child: new Text('OK'),
@@ -90,19 +90,19 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
       key: _scaffoldKey,
       appBar: new AppBar(
           leading: new IconButton(
-              icon: new Icon(choices[5].icon),
-              onPressed:_requestPop
+              icon: new Icon(Icons.arrow_back),
+              onPressed:_askTosave
           ),
           title: new Text(widget.title),
           elevation: 5.0,
           actions: <Widget>[
             new IconButton(
-              icon: new Icon(choices[4].icon),
+              icon: new Icon(Icons.save),
               onPressed: (){
                 if(_titleController.text.isNotEmpty || _contentController.text.isNotEmpty){
                   isSaved
-                      ? updateMemo(_titleController.text, _contentController.text)
-                      : saveMemo(_titleController.text, _contentController.text);
+                      ? updateMemo(memoId,_titleController.text, _contentController.text)
+                      : print(saveMemo(_titleController.text, _contentController.text));
                   isSaved
                       ? _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('updated')))
                       : _scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('saved')));
@@ -112,7 +112,7 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
                 }else{
                   _doNotSave();
                 }
-              },//保存処理,
+              },
             ),
           ]
       ),
@@ -136,12 +136,8 @@ class CreatePageState extends State<CreatePage> with WidgetsBindingObserver{
         ],
       )
     );
-
-
-    }
-
   }
-
+}
 
 
 class CreatePage extends StatefulWidget {

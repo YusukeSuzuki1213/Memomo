@@ -1,70 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:memomo/create.dart';
-import 'package:memomo/icons.dart';
-import 'package:memomo/_list_tile.dart';
-import 'dart:convert';
-import 'dart:io';
+import 'package:memomo/list_tile_with_id.dart';
+import 'package:memomo/http.dart';
 import 'dart:async';
 
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _mainPageScaffoldKey = new GlobalKey<ScaffoldState>();
-  Choice _selectedChoice = choices[0];
-  final url = "http://www.suzusupo-niiyan.ga/memomo/read.php";
-  List<_ListTile> list = new List<_ListTile>();
+  List<ListTileWithId> _list = new List<ListTileWithId>();
 
+  @override
+  void initState() {
+    _makeMemoList();
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
 
-  void  makeMemoList() async{
-    final uri = new Uri.http('www.suzusupo-niiyan.ga', '/memomo/read.php', {'user_id':'1'});
-    var httpClient = new HttpClient();
-    List<_ListTile> result = new List<_ListTile>();
-    var memoData;
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-    try {
-      var request = await httpClient.postUrl(uri);
-      var response = await request.close();
-      if (response.statusCode == HttpStatus.OK) {
-        print("Succeeded in getting memo data");
-        var json = await response.transform(UTF8.decoder).join();
-        memoData = JSON.decode(json);
-      }else{
-        print('Error getting memo data:\nHttp status ${response.statusCode}');
-      }
-    }catch (exception) {
-      print('Failed getting memo data');
-    }
+  void  _makeMemoList() async{
+    List<ListTileWithId> result = new List<ListTileWithId>();
+    var memoData = await getMemo();
 
     for (var item in memoData) {
-      print(new ListTile().hashCode);
-      result.add(new _ListTile(
+      result.add(new ListTileWithId(
         id:int.parse(item["id"]),
         title: new Text(item["title"],
             style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
         subtitle: new Text(item["content"]),
         leading: new Icon(
-          choices[2].icon,
+          Icons.insert_drive_file,
           color: Colors.pink,
         ),
         trailing: new Text(item["updated_at"]),
-        onLongPress:() {_askedToLead(item["title"],item["content"]);},
+        onLongPress:() {_askAboutMemo(item["title"],item["content"]);},
         //onTap: ,//ここにgetIdを入れる
       ));
     }
 
-    for(var item in result){
-      print(item.getId);
-    }
     if (!mounted) return;
-
     setState(() {
-      print(result);
-      list = result;
+      _list = result;
     });
-
   }
 
-  Future<Null> _askedToLead(String title,String content) async {
+  void _createMemo(){
+    Navigator.push(context, new MaterialPageRoute<Null>(
+        settings: const RouteSettings(name: "/create"),
+        builder: (BuildContext context) => new CreatePage(title:widget.title),
+    ));
+  }
+
+  Future<Null> _askAboutMemo(String title,String content) async {
     await showDialog<Null>(
       context: context,
       child: new SimpleDialog(
@@ -77,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               _mainPageScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('copied')));
               Navigator.of(context).pop();
             },
-            child: const Text('タイトルをコピー',
+            child: const Text('Copy the title',
                 style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
           new SimpleDialogOption(
@@ -85,9 +77,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               print(content);
               Clipboard.setData(new ClipboardData(text: content));
               _mainPageScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('copied')));
-                  Navigator.of(context).pop();
+              Navigator.of(context).pop();
             },
-            child: const Text('メモをコピー',
+            child: const Text('Copy the content',
                 style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
           new SimpleDialogOption(
@@ -95,51 +87,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               Clipboard.setData(new ClipboardData(text: "# "+title+"\n"+content));
               _mainPageScaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('copied')));
               Navigator.of(context).pop();
-              },
-            child: const Text('タイトルとメモをコピー',
+            },
+            child: const Text('Copy the title & content',
                 style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
           new SimpleDialogOption(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text('削除',
+            child: const Text('Delete',
                 style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
           ),
         ],
       ),
     );
   }
-
-  void _select(Choice choice) {
-    setState(() { // Causes the app to rebuild with the new _selectedChoice.
-      _selectedChoice = choice;
-    });
-  }
-
-  void createMemo(){
-    Navigator.push(context, new MaterialPageRoute<Null>(
-        settings: const RouteSettings(name: "/create"),
-        builder: (BuildContext context) => new CreatePage(title:widget.title),
-    ));
-  }
-
-  @override
-  void initState() {
-    makeMemoList();
-    print("oncreate was called");
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    print("dispose was called");
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  AppLifecycleState _notification;
 
   @override
   Widget build(BuildContext context) {
@@ -150,13 +112,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         elevation: 5.0,
         actions: <Widget>[
           new IconButton( // action button
-            icon: new Icon(choices[0].icon),
-            onPressed: () { _select(choices[0]); },
+            icon: new Icon(Icons.sort),
+            onPressed: () {},
           ),
           new IconButton( // action button
-            icon: new Icon(choices[1].icon),
-            onPressed: () { _select(choices[1]); },
+            icon: new Icon(Icons.search),
+            onPressed: () {},
           ),
+          new IconButton(
+            icon:new Icon(Icons.autorenew),
+            onPressed: (){},
+          )
 //          new PopupMenuButton<Choice>( // overflow menu
 //            onSelected: _select,
 //            itemBuilder: (BuildContext context) {
@@ -172,14 +138,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       ),
       body: new Center(
         child: new ListView(
-          children: list
+          children: _list
         ),
       ),
 
       floatingActionButton: new FloatingActionButton(
-        onPressed:createMemo,
+        onPressed:_createMemo,
         tooltip: 'Increment',
-        child: new Icon(choices[3].icon),
+        child: new Icon(Icons.add),
       ), // T
     );
   }
