@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:memomo/create.dart';
+import 'package:memomo/edit.dart';
 import 'package:memomo/list_tile_with_id.dart';
 import 'package:memomo/http.dart';
 import 'dart:async';
@@ -12,7 +13,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    _makeMemoList();
+    makeMemoList();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -23,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void  _makeMemoList() async{
+  void  makeMemoList() async{
     List<ListTileWithId> result = new List<ListTileWithId>();
     var memoData = await getMemo();
 
@@ -39,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ),
         trailing: new Text(item["updated_at"]),
         onLongPress:() {_askAboutMemo(item["title"],item["content"]);},
-        //onTap: ,//ここにgetIdを入れる
+        onTap:() {_editMemo(item["id"],item["title"],item["content"]);} ,
       ));
     }
 
@@ -53,6 +54,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     Navigator.push(context, new MaterialPageRoute<Null>(
         settings: const RouteSettings(name: "/create"),
         builder: (BuildContext context) => new CreatePage(title:widget.title),
+    ));
+  }
+
+  void _editMemo(memoId,savedTitle,savedContent){
+    Navigator.push(context, new MaterialPageRoute<Null>(
+      settings: const RouteSettings(name: "/edit"),
+      builder: (BuildContext context) => new EditPage(memoId,savedTitle,savedContent,title:widget.title),
     ));
   }
 

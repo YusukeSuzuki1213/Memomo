@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:memomo/edit_create.dart';
 import 'package:memomo/http.dart';
 
-class CreatePageState extends EditCreatePageState {
+class EditPageState extends EditCreatePageState{
 
+  EditPageState(id,title,content){
+    memoId = id;
+    titleController.text = title;
+    contentController.text = content;
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     return new Scaffold(
         key: scaffoldKey,
         appBar: new AppBar(
             leading: new IconButton(
                 icon: new Icon(Icons.arrow_back),
-                onPressed:(){askToSave("create");}
+                onPressed:(){askToSave("edit");}
             ),
             title: new Text("memomo"),
             elevation: 5.0,
@@ -19,12 +27,8 @@ class CreatePageState extends EditCreatePageState {
                 icon: new Icon(Icons.save),
                 onPressed: (){
                   if(titleController.text.isNotEmpty || contentController.text.isNotEmpty){
-                    isSaved
-                        ? updateMemo(memoId,titleController.text, contentController.text)
-                        : saveMemo(titleController.text, contentController.text).then((id) => memoId = id);
-                    isSaved
-                        ? scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('updated')))
-                        : scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('saved')));
+                    updateMemo(memoId,titleController.text, contentController.text);
+                    scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text('updated')));
                     isSaved = true;
                     savedTitle = titleController.text;
                     savedContent = contentController.text;
@@ -57,13 +61,17 @@ class CreatePageState extends EditCreatePageState {
         )
     );
   }
+
 }
 
-class CreatePage extends StatefulWidget {
+class EditPage extends StatefulWidget {
   final String title;
-  CreatePage({Key key, this.title}) : super(key: key);
+  final String memoId;
+  final String savedTitle;
+  final String savedContent;
+
+  EditPage(this.memoId,this.savedTitle,this.savedContent,{Key key, this.title}) : super(key: key);
 
   @override
-  CreatePageState createState() => new CreatePageState();
+  EditPageState createState() => new EditPageState(memoId,savedTitle,savedContent);
 }
-
