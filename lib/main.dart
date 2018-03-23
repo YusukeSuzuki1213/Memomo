@@ -13,7 +13,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    makeMemoList();
+    _makeMemoList();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -24,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void  makeMemoList() async{
+  void  _makeMemoList() async{
     List<ListTileWithId> result = new List<ListTileWithId>();
     var memoData = await getMemo();
 
@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           color: Colors.pink,
         ),
         trailing: new Text(item["updated_at"]),
-        onLongPress:() {_askAboutMemo(item["title"],item["content"]);},
+        onLongPress:() {_askAboutMemo(item["id"],item["title"],item["content"]);},
         onTap:() {_editMemo(item["id"],item["title"],item["content"]);} ,
       ));
     }
@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     ));
   }
 
-  Future<Null> _askAboutMemo(String title,String content) async {
+  Future<Null> _askAboutMemo(String id,String title,String content) async {
     await showDialog<Null>(
       context: context,
       child: new SimpleDialog(
@@ -101,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           ),
           new SimpleDialogOption(
             onPressed: () {
+              deleteMemo(id);
               Navigator.of(context).pop();
             },
             child: const Text('Delete',

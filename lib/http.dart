@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+
 getMemo() async{
    final uri = new Uri.http('www.suzusupo-niiyan.ga', '/memomo/read.php', {'user_id':'1'});
    var httpClient = new HttpClient();
@@ -42,10 +43,6 @@ Future<String> saveMemo(title,content) async{
 }
 
 void updateMemo(id,title,content){
-  print(id+"\n");
-  print(title+"\n");
-  print(content+"\n");
-
   final url = "http://www.suzusupo-niiyan.ga/memomo/update.php";
   http.post(url, body: {
     "user_id": "1",
@@ -58,4 +55,15 @@ void updateMemo(id,title,content){
     print("Response body: ${response.body}");
   });
 
+}
+
+Future deleteMemo(String id){
+  final url = "http://www.suzusupo-niiyan.ga/memomo/delete.php";
+  http.post(url, body: {
+    "user_id": "1",
+    "id":id,
+  }).then((response) {
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+  });
 }

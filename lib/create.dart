@@ -48,7 +48,7 @@ class CreatePageState extends EditCreatePageState {
             new TextField(
               controller: contentController,
               maxLengthEnforced: false,
-              maxLines: null,
+              maxLines: 5,
               decoration: new InputDecoration(
                 hintText: 'Content',
               ),
