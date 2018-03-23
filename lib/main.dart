@@ -9,6 +9,7 @@ import 'dart:async';
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _mainPageScaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
   List<ListTileWithId> _list = new List<ListTileWithId>();
 
   @override
@@ -24,13 +25,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
+
   void  _makeMemoList() async{
     List<ListTileWithId> result = new List<ListTileWithId>();
     var memoData = await getMemo();
-
     for (var item in memoData) {
       result.add(new ListTileWithId(
-        id:int.parse(item["id"]),
         title: new Text(item["title"],
             style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
         subtitle: new Text(item["content"]),
@@ -39,8 +39,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           color: Colors.pink,
         ),
         trailing: new Text(item["updated_at"]),
-        onLongPress:() {_askAboutMemo(item["id"],item["title"],item["content"]);},
-        onTap:() {_editMemo(item["id"],item["title"],item["content"]);} ,
+        onLongPress:() {_askAboutMemo(item["index"], item["id"], item["title"], item["content"]);},
+        onTap:() {_editMemo(item["id"], item["title"], item["content"]);} ,
       ));
     }
 
@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     ));
   }
 
-  Future<Null> _askAboutMemo(String id,String title,String content) async {
+  Future<Null> _askAboutMemo(int index,String id,String title,String content) async {
     await showDialog<Null>(
       context: context,
       child: new SimpleDialog(
@@ -103,9 +103,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             onPressed: () {
               deleteMemo(id);
               Navigator.of(context).pop();
+              var result = _list;
+              result.removeAt(index);
+              setState(() {_list = result;});
+
             },
             child: const Text('Delete',
                 style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
+
           ),
         ],
       ),
@@ -120,6 +125,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         title: new Text(widget.title),
         elevation: 5.0,
         actions: <Widget>[
+          new IconButton(
+            icon:new Icon(Icons.refresh),
+            onPressed: (){_makeMemoList();},
+          ),
           new IconButton( // action button
             icon: new Icon(Icons.sort),
             onPressed: () {},
@@ -128,10 +137,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             icon: new Icon(Icons.search),
             onPressed: () {},
           ),
-          new IconButton(
-            icon:new Icon(Icons.sync),
-            onPressed: (){_makeMemoList();},
-          )
+
 //          new PopupMenuButton<Choice>( // overflow menu
 //            onSelected: _select,
 //            itemBuilder: (BuildContext context) {
@@ -145,11 +151,21 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 //          ),
         ],
       ),
-      body: new Center(
-        child: new ListView(
-          children: _list
+
+      body: new  RefreshIndicator(
+        key: _refreshIndicatorKey,
+        child: new Center(
+          child: new ListView(
+            children: _list,
+          ),
         ),
-      ),
+        onRefresh: (){
+          Completer<Null> completer = new Completer<Null>();
+          _makeMemoList();
+          completer.complete();
+          return completer.future;
+          },
+    ),
 
       floatingActionButton: new FloatingActionButton(
         onPressed:_createMemo,

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
-getMemo() async{
+Future<List<Map<String,dynamic>>> getMemo() async{
    final uri = new Uri.http('www.suzusupo-niiyan.ga', '/memomo/read.php', {'user_id':'1'});
    var httpClient = new HttpClient();
    var memoData;
@@ -16,6 +16,11 @@ getMemo() async{
       var json = await response.transform(UTF8.decoder).join();
       memoData = JSON.decode(json);
       print(memoData);
+      var index=0;
+      for(var item in memoData){
+        item.addAll({"index": index++ });
+      }
+
     }else{
       print('Error getting memo data:\nHttp status ${response.statusCode}');
     }

@@ -11,7 +11,7 @@ class ListTileWithId extends ListTile{
   final GestureTapCallback onTap;
   final GestureLongPressCallback onLongPress;
   final bool selected;
-  final int id;
+  final int index;
 
   ListTileWithId({
     Key key,
@@ -25,7 +25,7 @@ class ListTileWithId extends ListTile{
     this.onTap,
     this.onLongPress,
     this.selected: false,
-    this.id,
+    this.index,
   }) :super(
       key:key,
       leading:leading,
@@ -39,5 +39,5 @@ class ListTileWithId extends ListTile{
       onLongPress:onLongPress,
       selected:selected);
 
-  int get getId => id;
+  int get getIndex => index;
 }
