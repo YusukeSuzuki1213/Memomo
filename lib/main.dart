@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:memomo/create.dart';
 import 'package:memomo/edit.dart';
-import 'package:memomo/list_tile_with_id.dart';
 import 'package:memomo/http.dart';
 import 'dart:async';
 
@@ -10,7 +9,7 @@ import 'dart:async';
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _mainPageScaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
-  List<ListTileWithId> _list = new List<ListTileWithId>();
+  List<ListTile> _list = new List<ListTile>();
 
   @override
   void initState() {
@@ -25,12 +24,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-
   void  _makeMemoList() async{
-    List<ListTileWithId> result = new List<ListTileWithId>();
+    List<ListTile> result = new List<ListTile>();
     var memoData = await getMemo();
     for (var item in memoData) {
-      result.add(new ListTileWithId(
+      result.add(new ListTile(
         title: new Text(item["title"],
             style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
         subtitle: new Text(item["content"]),
@@ -102,10 +100,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           new SimpleDialogOption(
             onPressed: () {
               deleteMemo(id);
-              Navigator.of(context).pop();
               var result = _list;
               result.removeAt(index);
               setState(() {_list = result;});
+              Navigator.of(context).pop();
 
             },
             child: const Text('Delete',

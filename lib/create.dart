@@ -36,7 +36,7 @@ class CreatePageState extends EditCreatePageState {
             ]
         ),
 
-        body:new Column(
+        body:new ListView(
           children: <Widget>[
             new TextField(
               autofocus: true,
@@ -48,9 +48,51 @@ class CreatePageState extends EditCreatePageState {
             new TextField(
               controller: contentController,
               maxLengthEnforced: false,
-              maxLines: 5,
+              maxLines: null,
               decoration: new InputDecoration(
                 hintText: 'Content',
+              ),
+            ),
+            new Container(
+              margin: new EdgeInsets.symmetric(vertical: 20.0),
+              height: 50.0,
+              color: Colors.grey[300],
+              child: new ListView(
+                scrollDirection: Axis.horizontal,
+                children: <Widget>[
+                  new Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: new FlatButton(
+                      onPressed:(){print("fdsaf");},
+                      child: new Text('*'),
+                      color: Colors.white,
+                    ),
+                  ),
+                  new Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: new FlatButton(
+                      onPressed:(){print("fdsaf");},
+                      child: new Text('*'),
+                      color: Colors.white,
+                    ),
+                  ),
+                  new Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: new FlatButton(
+                      onPressed:(){print("fdsaf");},
+                      child: new Text('#'),
+                      color: Colors.white,
+                    ),
+                  ),
+                  new Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: new FlatButton(
+                      onPressed:(){print("fdsaf");},
+                      child: new Text('[](URL)'),
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
