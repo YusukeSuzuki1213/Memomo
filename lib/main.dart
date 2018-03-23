@@ -104,11 +104,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               result.removeAt(index);
               setState(() {_list = result;});
               Navigator.of(context).pop();
-
             },
             child: const Text('Delete',
                 style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0)),
-
           ),
         ],
       ),
@@ -168,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       floatingActionButton: new FloatingActionButton(
         onPressed:_createMemo,
         tooltip: 'Increment',
-        child: new Icon(Icons.add),
+        child: new Icon(Icons.create),
       ), // T
     );
   }

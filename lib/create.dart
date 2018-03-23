@@ -48,13 +48,13 @@ class CreatePageState extends EditCreatePageState {
             new TextField(
               controller: contentController,
               maxLengthEnforced: false,
-              maxLines: null,
+              maxLines: 5,
               decoration: new InputDecoration(
                 hintText: 'Content',
               ),
             ),
             new Container(
-              margin: new EdgeInsets.symmetric(vertical: 20.0),
+              margin: new EdgeInsets.symmetric(vertical: 10.0),
               height: 50.0,
               color: Colors.grey[300],
               child: new ListView(
@@ -71,15 +71,7 @@ class CreatePageState extends EditCreatePageState {
                   new Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: new FlatButton(
-                      onPressed:(){print("fdsaf");},
-                      child: new Text('*'),
-                      color: Colors.white,
-                    ),
-                  ),
-                  new Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: new FlatButton(
-                      onPressed:(){print("fdsaf");},
+                      onPressed:(){},
                       child: new Text('#'),
                       color: Colors.white,
                     ),
